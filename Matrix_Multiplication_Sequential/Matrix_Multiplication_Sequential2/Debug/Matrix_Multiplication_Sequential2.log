@@ -1,0 +1,4 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(519,5): warning MSB8028: Katalog pośredni (Debug\) zawiera pliki udostępnione z innego projektu (Matrix_Multiplication_Sequential2.vcxproj). Może to spowodować niepoprawne zachowanie podczas oczyszczania i ponownej kompilacji.
+  Matrix_Multiplication_Sequential.cpp
+C:\Users\Kacper\source\repos\Matrix_Multiplication_Sequential\Matrix_Multiplication_Sequential2\Matrix_Multiplication_Sequential.cpp(18,35): warning C4244: "=": konwersja z "int" do "float", możliwa utrata danych
+  Matrix_Multiplication_Sequential2.vcxproj -> C:\Users\Kacper\source\repos\Matrix_Multiplication_Sequential\Debug\Matrix_Multiplication_Sequential.exe
