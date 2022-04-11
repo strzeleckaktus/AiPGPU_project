@@ -1,0 +1,1 @@
+C:\Users\Adrian\Uni\GPU\VS_studio\matrix_transpose\transpose\x64\Debug\transpose.exe
