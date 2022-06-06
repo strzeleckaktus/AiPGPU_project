@@ -1,0 +1,2 @@
+C:\Users\Adrian\Uni\GPU\Jordan\x64\Debug\Jordan.exe
+C:\Users\Adrian\Uni\GPU\Project\source\matrix_jordan_inverse\x64\Debug\Jordan.exe
