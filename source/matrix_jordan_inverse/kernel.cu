@@ -1,4 +1,16 @@
-﻿#include <stdio.h>
+﻿/**
+ * @mainpage Gauss-Jordan inverse
+ * @file kernel.cu
+ * @author Adrian Smoła & Kacper Godula
+ * @brief This specific kernel file corresponds to Gauss-Jordan inverse of matrix
+ * @version 0.1
+ * @date 2022-06-30
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
+#include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -14,11 +26,19 @@
 
 using namespace std;
 
+/**
+ * @brief Kernel doing Gauss-Jordan elimination in a specific row.
+ * 
+ * @param A Input matrix 
+ * @param I Identity matrix
+ * @param n Size of matrix
+ * @param i Variable used to limit the operation to rows below the pivot point 
+ */
 __global__ void gaussjordan(float* A, float* I, int n, int i)
 {
-    int x = blockIdx.x * blockDim.x + threadIdx.x;
-    int y = blockIdx.y * blockDim.y + threadIdx.y;
-    float P;
+    int x = blockIdx.x * blockDim.x + threadIdx.x; /**< Current thread in x axis */
+    int y = blockIdx.y * blockDim.y + threadIdx.y; /**< Current thread in y axis*/
+    float P; /**< Variable to store Pivot*/
 
     if (x < n && y < n)
         if (x > i) { // this limits operation to rows below the pivot point
@@ -30,24 +50,37 @@ __global__ void gaussjordan(float* A, float* I, int n, int i)
         }
 }
 
-
+/**
+ * @brief Kernel responsible for dividing the rows containing pivot elements by those pivot elements
+ * 
+ * @param d_A Modified input matrix
+ * @param dI modified Identity Matrix
+ * @param h size of matrix
+ */
 __global__ void dev(float* d_A, float* dI, int h)
 {
-    int x = blockIdx.x * blockDim.x + threadIdx.x;
-    int y = blockIdx.y * blockDim.y + threadIdx.y;
+    int x = blockIdx.x * blockDim.x + threadIdx.x; /**< Current thread in x axis */
+    int y = blockIdx.y * blockDim.y + threadIdx.y; /**< Current thread in y axis*/
 
     if (x < h && y < h)
         if (d_A[x * h + x] != 0) {
             dI[x * h + y] /= d_A[x * h + x];
             d_A[x * h + y] /= d_A[x * h + x];
         }
-    __syncthreads();
+    __syncthreads();  /**< Synchronize threads*/
 
 }
-
+/**
+ * @brief Function used to save values from matrix to a file
+ * 
+ * @param A Matrix passed to function
+ * @param s Name of the file
+ * @param n Number of columns in the matrix
+ * @param h Number of rows in the matrix
+ */
 void savetofile(float* A, string s, int n, int h)
 {
-    std::ofstream plik;
+    std::ofstream plik; /**< ofstream entity */
     plik.open(s);
 
     for (int j = 0; j < h; j++) {
@@ -59,37 +92,50 @@ void savetofile(float* A, string s, int n, int h)
     plik.close();
 }
 
+/**
+ * @brief Function used to generate random floats to fill the matrix
+ * 
+ * @param vect Vector containing all of the indeces of a matrix
+ * @param N Size of vector
+ */
 void random_floats(float* vect, int N) {
     for (int i = 0; i < N; i++) {
         vect[i] =static_cast<float>(rand())/(static_cast<float>(RAND_MAX/50));
     }
 }
 
-
+/**
+ * @brief Main function of the file, in here we call all of the different functions and reserve memory
+ * 
+ * @return int 
+ */
 int main()
 {
-    int n = 16;
+    int n = 16; /**< Size of matrix*/
     // creating input
-    float* iL = new float[n * n];
-    float* L = new float[n * n];
+    float* iL = new float[n * n]; /**< Inverse matrix*/
+    float* L = new float[n * n]; /**< Input matrix*/
     random_floats(L, n * n);
     savetofile(L, "Input_matrix.txt", n, n);
 
     cout << "inv\n";
-    float* d_A, * I, * dI;
-    float time;
-    cudaError_t err;
-    cudaEvent_t start, stop;
+    float* d_A; /**< Modified input matrix*/
+    float * I; /**< Identity Matrix*/
+    float * dI; /**< Modified identity matrix*/
+    float time; /**< Variable to store time since start*/
+    cudaError_t err; /**< Cuda error instance*/
+    cudaEvent_t start; /**< cuda start event */
+    cudaEvent_t stop; /**< cuda stop event*/
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
-    int ddsize = n * n * sizeof(float);
+    int ddsize = n * n * sizeof(float); /**< memory needed for matrix*/
 
-    dim3 threadsPerBlock(n / 16, n / 16);
-    dim3 numBlocks(16, 16);
+    dim3 threadsPerBlock(n / 16, n / 16); /**< Threads per block*/
+    dim3 numBlocks(16, 16); /**< Number of blocks*/
     // memory allocation    
     err = cudaMalloc((void**)&d_A, ddsize);   if (err != cudaSuccess) { cout << cudaGetErrorString(err) << " in " << __FILE__ << " at line " << __LINE__ << endl; }
     err = cudaMalloc((void**)&dI, ddsize);   if (err != cudaSuccess) { cout << cudaGetErrorString(err) << " in " << __FILE__ << " at line " << __LINE__ << endl; }
-    I = new float[n * n];
+    I = new float[n * n]; 
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
