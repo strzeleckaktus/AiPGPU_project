@@ -1,4 +1,16 @@
-﻿#include<stdio.h>
+﻿/**
+ * @mainpage Matrix Gaussian elimination method
+ * @file kernel.cu
+ * @author Adrian Smoła & Kacper Godula
+ * @brief All of the code pertaining to functionality of matrix Gaussian elimination method
+ * @version 0.1
+ * @date 2022-07-03
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
+#include<stdio.h>
 #include<conio.h>
 #include<stdlib.h>
 #include <cstdlib>
@@ -9,6 +21,13 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
+/**
+ * @brief Kernel getting our input matrix to reduced low echelon form.
+ * 
+ * @param A_ Input matrix 
+ * @param B_ Output matrix
+ * @param size Size of matrix
+ */
 
 __global__ void Kernel(float* A_, float* B_, int size)
 {
@@ -32,6 +51,15 @@ __global__ void Kernel(float* A_, float* B_, int size)
 
     B_[idy * (size + 1) + idx] = temp[idy][idx];
 }
+
+/**
+ * @brief Function for reading the each of the variables and putting it into the matrix.
+ * 
+ * @param newchar Char being interpreted
+ * @param i Index telling us where to put the variable in the matrix
+ * @param data File from which we are reading
+ * @param temp_h Matrix into which we are putting the data
+ */
 
 // copying the value from file to array 
 void copyvalue(int newchar, int* i, FILE* data, float* temp_h)
@@ -99,6 +127,14 @@ void copyvalue(int newchar, int* i, FILE* data, float* temp_h)
     (*i)++;
 }
 
+/**
+ * @brief Function for allocation and dealocation of the memory as well as for running the kernel.
+ * 
+ * @param temp_h Pointer to input matrix
+ * @param variableNo Number of variables in the set of equations
+ * @param temp1_h Pointer to output matrix
+ */
+
 void DeviceFunc(float* temp_h, int variablesNo, float* temp1_h)
 {
     float* A_, * B_;
@@ -124,6 +160,13 @@ void DeviceFunc(float* temp_h, int variablesNo, float* temp1_h)
     cudaFree(A_);
     cudaFree(B_);
 }
+
+/**
+ * @brief Function for reading data from file.
+ * 
+ * @param temp_h Matrix in which variables will be stored 
+ * @param variablesNo number of variables in the set of equations
+ */
 
 void getvalue(float** temp_h, int* variablesNo) {
     FILE* data;
