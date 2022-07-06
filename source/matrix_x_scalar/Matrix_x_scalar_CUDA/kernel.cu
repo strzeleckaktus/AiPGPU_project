@@ -81,23 +81,23 @@ void printResults(float** A, float** B, int width) {
  * @return int 
  */
 int main() {
-    int N = 4; /**< size of matrix*/
+    int N = 4; 
 
-    float** A = new float* [N]; /**< Input matrix*/
+    float** A = new float* [N]; 
     A[0] = new float[N * N];
     for (int i = 1; i < N; i++) {
         A[i] = A[0] + i * N;
     }
     random_ints(A, N, N);
 
-    float** B = new float* [N]; /**< Output Matrix*/
+    float** B = new float* [N];
     B[0] = new float[N * N];
     for (int i = 1; i < N; i++) {
         B[i] = B[0] + i * N;
     }
 
-    float* cuda_A; /**< CUDA memory for input matrix*/
-    float* cuda_B; /**< CUDA memory for output matrix*/
+    float* cuda_A;
+    float* cuda_B; 
 
     cudaMalloc(&cuda_A, (N * N) * sizeof(float));
     cudaMalloc(&cuda_B, (N * N) * sizeof(float));

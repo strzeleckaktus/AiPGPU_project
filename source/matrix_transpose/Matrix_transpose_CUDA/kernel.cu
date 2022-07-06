@@ -31,10 +31,10 @@ using namespace std;
  */
 __global__ void Matrix_transpose(float* A, float* B, int A_rows, int A_cols) {
 
-    int Row = blockIdx.y * TILE_DIM + threadIdx.y; /**< Current thread in x axis */
-    int Col = blockIdx.x * TILE_DIM + threadIdx.x; /**< Current thread in y axis */
+    int Row = blockIdx.y * TILE_DIM + threadIdx.y; 
+    int Col = blockIdx.x * TILE_DIM + threadIdx.x; 
 
-    __shared__ float As[TILE_DIM][TILE_DIM]; /**< Shared memory block*/
+    __shared__ float As[TILE_DIM][TILE_DIM]; 
 
     if (Row < A_rows && Col < A_cols)
         As[threadIdx.x][threadIdx.y] = A[Row * A_cols + Col];
@@ -90,29 +90,29 @@ void printResults(float** A, float** B, size_t N, size_t M) {
  * @return int 
  */
 int main() {
-    int N = 5; /**< Number of columns in a matrix*/
-    int M = 5; /**< Number of rows in a matrix*/
+    int N = 5; 
+    int M = 5; 
 
-    cudaEvent_t start; /**< Cuda start event*/
-    cudaEvent_t stop; /**< Cuda stop event*/
+    cudaEvent_t start; 
+    cudaEvent_t stop; 
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
-    float** A = new float* [N]; /**< Input matrix*/
+    float** A = new float* [N]; 
     A[0] = new float[M * N];
     for (int i = 1; i < N; i++) {
         A[i] = A[0] + i * M;
     }
     random_ints(A, N, M);
 
-    float** B = new float* [M]; /**< Output matrix*/
+    float** B = new float* [M]; 
     B[0] = new float[M * N];
     for (int i = 1; i < M; i++) {
         B[i] = B[0] + i * N;
     }
 
-    float* cuda_A; /**< Input matrix in CUDA memory*/
-    float * cuda_B; /**< Output matrix in CUDA memory*/
+    float* cuda_A;
+    float * cuda_B; 
 
     cudaMalloc(&cuda_A, (N * M) * sizeof(float));
     cudaMalloc(&cuda_B, (N * M) * sizeof(float));

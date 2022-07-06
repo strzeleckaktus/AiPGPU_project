@@ -36,9 +36,9 @@ using namespace std;
  */
 __global__ void gaussjordan(float* A, float* I, int n, int i)
 {
-    int x = blockIdx.x * blockDim.x + threadIdx.x; /**< Current thread in x axis */
-    int y = blockIdx.y * blockDim.y + threadIdx.y; /**< Current thread in y axis*/
-    float P; /**< Variable to store Pivot*/
+    int x = blockIdx.x * blockDim.x + threadIdx.x; /
+    int y = blockIdx.y * blockDim.y + threadIdx.y; 
+    float P; 
 
     if (x < n && y < n)
         if (x > i) { // this limits operation to rows below the pivot point
@@ -59,15 +59,15 @@ __global__ void gaussjordan(float* A, float* I, int n, int i)
  */
 __global__ void dev(float* d_A, float* dI, int h)
 {
-    int x = blockIdx.x * blockDim.x + threadIdx.x; /**< Current thread in x axis */
-    int y = blockIdx.y * blockDim.y + threadIdx.y; /**< Current thread in y axis*/
+    int x = blockIdx.x * blockDim.x + threadIdx.x; 
+    int y = blockIdx.y * blockDim.y + threadIdx.y; 
 
     if (x < h && y < h)
         if (d_A[x * h + x] != 0) {
             dI[x * h + y] /= d_A[x * h + x];
             d_A[x * h + y] /= d_A[x * h + x];
         }
-    __syncthreads();  /**< Synchronize threads*/
+    __syncthreads();  
 
 }
 /**
@@ -80,7 +80,7 @@ __global__ void dev(float* d_A, float* dI, int h)
  */
 void savetofile(float* A, string s, int n, int h)
 {
-    std::ofstream plik; /**< ofstream entity */
+    std::ofstream plik; 
     plik.open(s);
 
     for (int j = 0; j < h; j++) {
@@ -111,27 +111,27 @@ void random_floats(float* vect, int N) {
  */
 int main()
 {
-    int n = 16; /**< Size of matrix*/
+    int n = 16; 
     // creating input
-    float* iL = new float[n * n]; /**< Inverse matrix*/
-    float* L = new float[n * n]; /**< Input matrix*/
+    float* iL = new float[n * n]; 
+    float* L = new float[n * n]; 
     random_floats(L, n * n);
     savetofile(L, "Input_matrix.txt", n, n);
 
     cout << "inv\n";
-    float* d_A; /**< Modified input matrix*/
-    float * I; /**< Identity Matrix*/
-    float * dI; /**< Modified identity matrix*/
-    float time; /**< Variable to store time since start*/
-    cudaError_t err; /**< Cuda error instance*/
-    cudaEvent_t start; /**< cuda start event */
-    cudaEvent_t stop; /**< cuda stop event*/
+    float* d_A; 
+    float * I; 
+    float * dI; 
+    float time; 
+    cudaError_t err; 
+    cudaEvent_t start; 
+    cudaEvent_t stop; 
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
-    int ddsize = n * n * sizeof(float); /**< memory needed for matrix*/
+    int ddsize = n * n * sizeof(float);
 
-    dim3 threadsPerBlock(n / 16, n / 16); /**< Threads per block*/
-    dim3 numBlocks(16, 16); /**< Number of blocks*/
+    dim3 threadsPerBlock(n / 16, n / 16); 
+    dim3 numBlocks(16, 16);
     // memory allocation    
     err = cudaMalloc((void**)&d_A, ddsize);   if (err != cudaSuccess) { cout << cudaGetErrorString(err) << " in " << __FILE__ << " at line " << __LINE__ << endl; }
     err = cudaMalloc((void**)&dI, ddsize);   if (err != cudaSuccess) { cout << cudaGetErrorString(err) << " in " << __FILE__ << " at line " << __LINE__ << endl; }
